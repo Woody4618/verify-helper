@@ -23,6 +23,29 @@ export async function POST(request: Request) {
         idl as Idl
       );
       console.log("Parsed Anchor events:", events);
+
+      // If we found an otterVerifyEvent, forward it to verify-with-signer
+      const otterEvent = events.find((e) => e.name === "otterVerifyEvent");
+      if (otterEvent && otterEvent.data) {
+        const verifyResponse = await fetch(
+          `${process.env.VERCEL_URL}/api/verify-with-signer`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              program_id: otterEvent.data.program.toString(),
+              signer: otterEvent.data.signer.toString(),
+              repository: "",
+              commit_hash: "",
+            }),
+          }
+        );
+
+        const verifyResult = await verifyResponse.json();
+        console.log("Verification result:", verifyResult);
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), {
