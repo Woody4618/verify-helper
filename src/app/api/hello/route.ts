@@ -1,9 +1,7 @@
-import { parseAnchorTransactionEvents } from "@solana-developers/helpers";
 import { Connection } from "@solana/web3.js";
-
-// The path is relative to where the code is executed (project root)
-const IDL_PATH =
-  "./src/app/api/hello/verifycLy8mB96wd9wqq3WDXQwM4oU6r42Th37Db9fC-idl.json";
+import idl from "./verifycLy8mB96wd9wqq3WDXQwM4oU6r42Th37Db9fC-idl.json";
+import { parseAnchorTransactionEvents } from "./parseEvents";
+import { Idl } from "@coral-xyz/anchor";
 
 export async function GET(request: Request) {
   return new Response("Hello, from API! + " + JSON.stringify(request));
@@ -18,11 +16,11 @@ export async function POST(request: Request) {
 
     // Parse events from the transaction
     const transaction = body[0]; // Since the webhook sends an array
-    if (transaction && transaction.events) {
-      const events = parseAnchorTransactionEvents(
-        IDL_PATH,
+    if (transaction && transaction.signature) {
+      const events = await parseAnchorTransactionEvents(
         transaction.signature,
-        connection
+        connection,
+        idl as Idl
       );
       console.log("Parsed Anchor events:", events);
     }
