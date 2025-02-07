@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       const otterEvent = events.find((e) => e.name === "otterVerifyEvent");
       if (otterEvent && otterEvent.data) {
         const verifyResponse = await fetch(
-          `https://verify.osec.io/api/verify-with-signer`,
+          `https://verify.osec.io/verify-with-signer`,
           {
             method: "POST",
             headers: {
