@@ -1,5 +1,12 @@
-import { Connection, PublicKey } from "@solana/web3.js";
-import { Program, AnchorProvider, EventParser, Idl } from "@coral-xyz/anchor";
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
+import {
+  Program,
+  AnchorProvider,
+  EventParser,
+  Idl,
+  Wallet,
+} from "@coral-xyz/anchor";
+import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 
 /**
  * Parses Anchor events from a transaction
@@ -14,20 +21,12 @@ export async function parseAnchorTransactionEvents(
   connection: Connection,
   idl: Idl
 ): Promise<Array<{ name: string; data: any }>> {
-  //   const provider = new AnchorProvider(
-  //     connection,
-  //     // Dummy wallet since we're just reading data
-  //     { publicKey: PublicKey.default } as any,
-  //     {}
-  //   );
-
-  const provider = connection
-    ? new AnchorProvider(connection, AnchorProvider.env().wallet, {})
-    : AnchorProvider.env();
-
+  let wallet = new NodeWallet(new Keypair());
+  const provider = new AnchorProvider(connection, wallet, {
+    commitment: "confirmed",
+  });
   const program = new Program(idl, provider);
 
-  // const program = new Program(idl, new PublicKey(idl.metadata.address), provider);
   const parser = new EventParser(program.programId, program.coder);
 
   const transaction = await provider.connection.getTransaction(signature, {
