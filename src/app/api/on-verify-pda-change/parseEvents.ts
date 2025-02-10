@@ -31,6 +31,7 @@ export async function parseAnchorTransactionEvents(
 
   const transaction = await provider.connection.getTransaction(signature, {
     commitment: "confirmed",
+    maxSupportedTransactionVersion: 0,
   });
 
   if (!transaction?.meta?.logMessages) {
