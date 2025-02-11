@@ -37,8 +37,8 @@ export async function POST(request: Request) {
             body: JSON.stringify({
               program_id: otterEvent.data.program.toString(),
               signer: otterEvent.data.signer.toString(),
-              repository: "",
-              commit_hash: "",
+              repository: otterEvent.data.params.gitUrl.toString(),
+              commit_hash: otterEvent.data.params.commit.toString(),
             }),
           }
         );
