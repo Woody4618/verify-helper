@@ -13,13 +13,21 @@ export async function POST(request: Request) {
     console.log("Received webhook payload:", body);
 
     const connection = new Connection(process.env.RPC_URL!);
-
-    // Wait until program transaction is finalized so that the verify API can catch up
-    await new Promise((resolve) => setTimeout(resolve, 20000));
+    const transaction = body[0]; // Since the webhook sends an array
 
     // Parse events from the transaction
-    const transaction = body[0]; // Since the webhook sends an array
     if (transaction && transaction.signature) {
+      const latestBlockHash = await connection.getLatestBlockhash();
+
+      await connection.confirmTransaction(
+        {
+          blockhash: latestBlockHash.blockhash,
+          lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+          signature: transaction.signature,
+        },
+        "finalized"
+      );
+
       const events = await parseAnchorTransactionEvents(
         transaction.signature,
         connection,
