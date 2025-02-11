@@ -14,6 +14,9 @@ export async function POST(request: Request) {
 
     const connection = new Connection(process.env.RPC_URL!);
 
+    // Wait until program transaction is finalized so that the verify API can catch up
+    await new Promise((resolve) => setTimeout(resolve, 20000));
+
     // Parse events from the transaction
     const transaction = body[0]; // Since the webhook sends an array
     if (transaction && transaction.signature) {
